@@ -1,11 +1,13 @@
 const express = require("express");
 const mongoose = require("mongoose");
-const app = express();
 const productModel = require("./models/productModel");
 const env = require("dotenv");
+const cors = require("cors");
+const app = express();
 
 env.config();
 app.use(express.json());
+app.use(cors());
 
 mongoose.connect(
     `mongodb+srv://${process.env.MONGO_DB_USER}:${process.env.MONGO_DB_PASSWORD}@cluster0.gnws6.mongodb.net/${process.env.MONGO_DB_DATABASE}?retryWrites=true&w=majority`,
@@ -15,9 +17,17 @@ mongoose.connect(
 );
 
 app.post("/entry", async (req, res) => {
-    const product = new productModel(
-        { productTitle: "test", productPrice: 100, productImageLink: "abc", productDiscription: "i got a go" }
-    );
+    const title = req.body.Title;
+    const price = req.body.Price;
+    const imageLink = req.body.ImageLink;
+    const discription = req.body.Discription;
+
+    const product = new productModel({
+        productTitle: title,
+        productPrice: price,
+        productImageLink: imageLink,
+        productDiscription: discription,
+    });
 
     try {
         await product.save();
